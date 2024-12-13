@@ -1,22 +1,75 @@
-// Importação da base de dados e das funções
-import { database } from "./database.js";
-import { getProdId, loadProducts } from "./functions.js";
+console.log('oie');
 
-// -------- Variáveis do projeto ------------------------
-const sectionNovidades = document.querySelector("#section-1 .carrousel");
-const sectionMaisVendidos = document.querySelector("#section-2 .carrousel");
-const sectionPromocoes = document.querySelector("#section-3 .carrousel");
+// Função para carregar todos os produtos
+export function loadProducts(products, section) {
+ 
+  // Fazer uma requisição para a API Django para pegar os produtos
+  fetch('http://127.0.0.1:8000/api/produtos')  // Ajuste para o URL da sua API Django
+    .then(response => response.json())
+    .then(products => {
+      console.log(products)
+      // Filtro Novidade
+      const produtosNovidades = products.filter(produto => produto.classificacaoProduto === "Novidades");
+ 
+      // Filtro Mais Vendidos
+      // const produtosMaisVendidos = products.filter(produto => produto.classificacaoProduto === "Mais Vendidos");
+ 
+      // const produtosPromoções = products.filter(produto => produto.classificacaoProduto === "Promoções");
+     
+ 
+      function createProductCard(produto, targetSection) {
+        const precoNumerico = parseFloat(produto.preco);
+        if (isNaN(precoNumerico)) {
+          console.error('Preço inválido:', produto.preco);
+          return;
+        }
+        const valParcela = (precoNumerico / 10).toFixed(2);
+        const card = document.createElement("div");
+        card.classList.add("product-card", "idprod");
+        card.id = produto.codigoProduto;
+     
+        card.innerHTML = `
+          <div>
+            <img id="${produto.id}" src="${produto.imgProduto}" alt="${produto.tituloProduto}" width="168px" />
+          </div>
+          <div class="product-card-info-container">
+            <h2 class="product-card-title" title="${produto.tituloProduto}">${produto.tituloProduto}</h2>
+            <h4 class="product-card-reference">Cod. ${produto.id}</h4>
+            <h3 class="product-card-price">R$ ${precoNumerico.toFixed(2)}</h3>
+            <h4 class="product-card-installment">10x of R$${valParcela} interest-free</h4>
+          </div>
+          <div class="cart-e-compra">
+            <button id="${produto.id}" class="product-card-btn">PURCHASE</button>
+            <button class="product-card-btn-cart" data-id="${produto.id}"><i class="bi bi-cart"></i></button>
+          </div>`;
+       
+        card.querySelector('.product-card-btn').addEventListener('click', () => {
+          const productData = {
+            id: produto.codigoProduto,
+            titulo: produto.tituloProduto,
+            preco: precoNumerico.toFixed(2),
+            descricao: produto.descricao,
+            categoria: produto.categoriaProduto,
+            imagens: produto.imagensProduto,
+          };
+          localStorage.setItem('selectedProduct', JSON.stringify(productData));
+          window.location.href = '../product.html';
+        });
+     
+        document.querySelector(targetSection).appendChild(card);
+      }
+ 
+      produtosNovidades.forEach(produto => createProductCard(produto, "#section-1 .carrousel"));
+      // produtosMaisVendidos.forEach(produto => createProductCard(produto, "#section-2 .carrousel"));
+      // produtosPromoções.forEach(produto => createProductCard(produto, "#section-3 .carrousel"));
 
-// Filtros
-let filtroCategoriaNovidades = database.filter(produto => produto.classificacaoProduto === "Novidades" && produto.exibirHome == true);
-let filtroMaisVendidos = database.filter(produto => produto.classificacaoProduto === "Mais_Vendidos" && produto.exibirHome == true);
-let filtroPromocoes = database.filter(produto => produto.classificacaoProduto === "Promocoes" && produto.exibirHome == true);
+    })
+    .catch(error => {
+      console.error('Erro ao carregar produtos:', error);
+    });
+}
 
-// Funções com parâmetros
-loadProducts(filtroCategoriaNovidades, sectionNovidades);
-loadProducts(filtroMaisVendidos, sectionMaisVendidos);
-loadProducts(filtroPromocoes, sectionPromocoes);
-getProdId();
+loadProducts()
 
 // ------- Carrousel de produtos (Seção Novidades) -------------------
 const productCarousel1 = document.querySelector('#section-1 .carrousel');

@@ -67,11 +67,13 @@
     font-size: 25px;
     font-family: "Nunito", sans-serif;
     color: #ffffff;
+    cursor: pointer;
 }
 
 #logo_sneakers {
     font-size: 25px;
     color: #3c68aa;
+    cursor: pointer;
 }
 
 .menus {
