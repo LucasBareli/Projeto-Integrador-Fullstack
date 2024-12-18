@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 def listar_produtos(request):
     if request.method == 'GET':
         queryset = Produto.objects.all()
-        serializer = ProdutoSerializer(queryset, many=True)
+        serializer = ProdutoSerializer(queryset, many=True)     
         return Response(serializer.data)
     elif request.method == 'POST':
         serializer = ProdutoSerializer(data = request.data)

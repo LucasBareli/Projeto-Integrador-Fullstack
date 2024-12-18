@@ -1,5 +1,3 @@
-console.log('oie');
-
 // Função para carregar todos os produtos
 export function loadProducts(products, section) {
  
@@ -7,9 +5,8 @@ export function loadProducts(products, section) {
   fetch('http://127.0.0.1:8000/api/produtos')  // Ajuste para o URL da sua API Django
     .then(response => response.json())
     .then(products => {
-      console.log(products)
       // Filtro Novidade
-      const produtosNovidades = products.filter(produto => produto.classificacaoProduto === "Novidades");
+      const produtosNovidades = products.filter(produto => produto.classProduto === "Novidades");
  
       // Filtro Mais Vendidos
       // const produtosMaisVendidos = products.filter(produto => produto.classificacaoProduto === "Mais Vendidos");
@@ -27,10 +24,10 @@ export function loadProducts(products, section) {
         const card = document.createElement("div");
         card.classList.add("product-card", "idprod");
         card.id = produto.codigoProduto;
-     
+        const product_images = JSON.parse(produto.imgProduto)
         card.innerHTML = `
           <div>
-            <img id="${produto.id}" src="${produto.imgProduto}" alt="${produto.tituloProduto}" width="168px" />
+            <img id="${produto.id}" src="${product_images.imagem_principal}" alt="${produto.tituloProduto}" width="168px" />
           </div>
           <div class="product-card-info-container">
             <h2 class="product-card-title" title="${produto.tituloProduto}">${produto.tituloProduto}</h2>
@@ -39,8 +36,7 @@ export function loadProducts(products, section) {
             <h4 class="product-card-installment">10x of R$${valParcela} interest-free</h4>
           </div>
           <div class="cart-e-compra">
-            <button id="${produto.id}" class="product-card-btn">PURCHASE</button>
-            <button class="product-card-btn-cart" data-id="${produto.id}"><i class="bi bi-cart"></i></button>
+            <button id="${produto.id}" class="product-card-btn">BUY</button>
           </div>`;
        
         card.querySelector('.product-card-btn').addEventListener('click', () => {
